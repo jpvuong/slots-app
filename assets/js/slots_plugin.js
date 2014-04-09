@@ -1,3 +1,9 @@
+/* **************************************************
+   TODO: Preload images
+         Optimize images using grunt-contrib-imagemin
+         LiveReload
+ ****************************************************/
+
 ;
 window.slots = (function() {
   'use strict';
@@ -6,13 +12,16 @@ window.slots = (function() {
     settings = {
       container: null,
       jackpot: 2467589.32,
+      spinBtnText: '',
       images: [],
-      imagesDir: 'assets/images/',
+      imagesDir: 'https://raw.githubusercontent.com/jpvuong/slots-app/master/assets/images/',
+      // imagesDir: 'assets/images/slot_elements/',
       imageExt: '.png',
-      imageWidth: 87,
-      imageHeight: 96,
+      imageWidth: 100,
+      imageHeight: 103,
       cols: 5,
       rows: 3,
+      majorWinOnly: false,
       minorWinRate: 2,
       majorWinRate: 5,
       minorWinOn: '',
@@ -20,13 +29,19 @@ window.slots = (function() {
       noWinOn: 1,
       duration: 600,
       delayed: 200,
-      easing: 'easeOutBounce'
+      easing: 'easeOutBounce',
+      startMsg: 'Click "spin" to spin the reels',
+      tryAgainMsg: 
+        'Bad luck. Try another spin to see if you hit a winning line.'
     },
 
     jqueryMap = {
       $container: null,
+      $slotsWrapper: null,
       $slots: null,
+      $winningLine: null,
       $jackpot: null,
+      $statusDisplay: null,
       $spinBtn: null
     },
 
@@ -34,18 +49,23 @@ window.slots = (function() {
       slots: [],
       spins: 0,
       isSpinning: false,
+      colLoadedCounter: 0,
       minorWinAt: 0,
       majorWinAt: 0,
+      width: '',
+      height: '',
       offsetPixel: 0,
       topPixel: '',
       minorWin: false,
       majorWin: false,
-      jackpot: settings.jackpot
+      jackpot: '',
+      prize: null
     },
 
     setJqueryMap, genRandomWin, setup, build, createSlots, createSlotCol, 
     createSlotElems, willLose, createProgressiveJackpot, jackpotInt,
-    createSpinBtn, spinIt, showWin, reset, init
+    createStatusDisplay, createSpinBtn, createWinningLine, spinIt,
+    slotsSpinning, slotsStopped, registerRedirect, showWin, reset, init
   ;
 
   setJqueryMap = function( extend ) {
@@ -65,8 +85,10 @@ window.slots = (function() {
 
   setup = function() {
     setJqueryMap( { $container: settings.container } );
-    console.log(jqueryMap);
     genRandomWin();
+
+    stateMap.width = parseInt(settings.imageWidth * settings.cols) + 'px';
+    stateMap.height = parseInt(settings.imageHeight * settings.rows) + 'px';
 
     stateMap.offsetPixel = parseInt(
       ( settings.imageHeight * (_.size(settings.images) - settings.rows) )
@@ -80,22 +102,34 @@ window.slots = (function() {
   // build
   // TODO: Loading...
   build = function() {
-    var slots = document.createElement('div');
+    var slotsWrapper = document.createElement('div'),
+        slots = document.createElement('div');
+
+    slotsWrapper.className = 'slots-wrapper';
     slots.className = 'slots';
 
-    jqueryMap.$container.append(slots);
+    slotsWrapper.appendChild(slots);
 
-    setJqueryMap( { $slots: jqueryMap.$container.find('.slots') } );
+    jqueryMap.$container
+      .addClass('slots-loading')
+      .append(slotsWrapper);
 
-    jqueryMap.$slots
-      .css('height', settings.imageHeight * settings.rows);
+    setJqueryMap({
+      $slotsWrapper: jqueryMap.$container.find('.slots-wrapper'),
+      $slots: jqueryMap.$container.find('.slots')
+    });
+
+    slots.style.width = stateMap.width;
+    slots.style.height = stateMap.height;
 
     _.each(createSlots(), function(slot) {
-      jqueryMap.$slots.append(slot);
+      slots.appendChild(slot);
     });
 
     createProgressiveJackpot();
+    createStatusDisplay();
     createSpinBtn();
+    createWinningLine();
   };
 
   // returns an array of ul elements
@@ -131,33 +165,43 @@ window.slots = (function() {
         slotElems = [],
         slotValues = [],
         index = 0,
-        randomPos = _.random(1, settings.rows - 1);
+        i = 0;
 
     $.extend(shuffled, _.shuffle(settings.images));
 
     stateMap.minorWin = false;
     stateMap.majorWin = false;
 
-    if (stateMap.spins == (stateMap.minorWinAt - 1)) {
+    if (stateMap.spins == (stateMap.minorWinAt - 1) && !settings.majorWinOnly) {
       stateMap.minorWin = true;
 
       index = shuffled.indexOf(settings.minorWinOn);
       shuffled.splice(index, 1);
-      shuffled.splice(randomPos, 0, settings.minorWinOn);
+      shuffled.splice(1, 0, settings.minorWinOn);
     } else if (stateMap.spins == (stateMap.majorWinAt - 1)) {
       stateMap.majorWin = true;
 
       index = shuffled.indexOf(settings.majorWinOn);
       shuffled.splice(index, 1);
-      shuffled.splice(randomPos, 0, settings.majorWinOn);
+      shuffled.splice(2, 0, settings.majorWinOn);
     }
 
     _.each(shuffled, function(image) {
       var li = document.createElement('li'),
-          img = document.createElement('img');
+          img = new Image();
+
+
+      li.style.width = settings.imageWidth + 'px';
+      li.style.height = settings.imageHeight + 'px';
 
       img.src = settings.imagesDir + image + settings.imageExt;
       img.setAttribute('data-value', image);
+
+      img.onload = function() {
+        i++;
+        if (i == settings.images.length)
+          $(document).trigger('load-complete');
+      }
 
       li.appendChild(img);
       slotElems.push(li);
@@ -204,30 +248,91 @@ window.slots = (function() {
   createProgressiveJackpot = function() {
     var jackpot = document.createElement('div');
     jackpot.className = 'slots-jackpot';
-    jackpot.innerHTML = settings.jackpot;
 
-    jqueryMap.$container.prepend(jackpot);
+    jqueryMap.$slotsWrapper.prepend(jackpot);
 
-    setJqueryMap( { $jackpot: jqueryMap.$container.find('.slots-jackpot') } );
+    setJqueryMap( { $jackpot: jqueryMap.$slotsWrapper.find('.slots-jackpot') } );
 
     jackpotInt = setInterval(function() {
-      // console.log(_.random(15, 30));
-    }, 100);
+      var random = _.random(0, 50);
+
+      settings.jackpot += (random / 100);
+
+      stateMap.jackpot = '$' + settings.jackpot.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      jackpot.innerHTML = stateMap.jackpot;
+    }, 150);
+  };
+
+  createStatusDisplay = function() {
+    var display = document.createElement('div'),
+        start = document.createElement('span'),
+        tryAgain = document.createElement('span');
+
+    display.className = 'slots-status-display show-start';
+
+    start.className = 'slots-status-start';
+    start.innerHTML = settings.startMsg;
+
+    tryAgain.className = 'slots-status-try-again';
+    tryAgain.innerHTML = settings.tryAgainMsg;
+
+    display.appendChild(start);
+    display.appendChild(tryAgain);
+
+    jqueryMap.$slotsWrapper.append(display);
+
+    setJqueryMap({
+      $statusDisplay: jqueryMap.$slotsWrapper.find('.slots-status-display')
+    });
+
+    $(document)
+      .on('slots-spinning', function() {
+        display.className = 'slots-status-display';
+      })
+      .on('slots-stopped', function() {
+        if (!stateMap.minorWin && !stateMap.majorWin)
+          display.className = 'slots-status-display show-try-again';
+      });
   };
 
   createSpinBtn = function() {
     var btn = document.createElement('button');
+
     btn.className = 'slots-btn';
-    btn.innerHTML = 'SPIN';
+    btn.innerHTML = settings.spinBtnText;
 
-    jqueryMap.$container.append(btn);
+    jqueryMap.$slotsWrapper.append(btn);
 
-    setJqueryMap( { $spinBtn: jqueryMap.$container.find('.slots-btn') } );
+    setJqueryMap( { $spinBtn: jqueryMap.$slotsWrapper.find('.slots-btn') } );
+
+    $(document)
+      .on('slots-spinning', function() {
+        btn.disabled = true;
+      })
+      .on('slots-stopped', function() {
+        btn.disabled = false;
+      });
+  };
+
+  createWinningLine = function() {
+    var winningLine = document.createElement('div');
+
+    winningLine.className = 'slots-winning-line';
+
+    jqueryMap.$slots.append(winningLine);
+
+    setJqueryMap( { $winningLine: jqueryMap.$slots.find('.slots-winning-line') } );
   };
 
   /* EVENT HANDLERS */
   spinIt = function( e ) {
     e.preventDefault();
+
+    if (stateMap.prize == 'minor') {
+      $(document).trigger('slots-hide-win');
+      stateMap.prize = null;
+    }
 
     if (!stateMap.isSpinning) {
       var i = 0,
@@ -235,8 +340,7 @@ window.slots = (function() {
           totalDuration = (stateMap.minorWin || stateMap.majorWin) ? 
             (settings.duration * 2) : settings.duration;
 
-      stateMap.isSpinning = true;
-      stateMap.slots = [];
+      $(document).trigger('slots-spinning');
 
       for (; i < settings.cols; i++) {
         duration = settings.duration;
@@ -256,24 +360,12 @@ window.slots = (function() {
         totalDuration += settings.delayed;
       }
 
-      console.log('totalDuration: ' + totalDuration);
-
       setTimeout(function() {
-        stateMap.isSpinning = false;
+        $(document).trigger('slots-stopped');
         
         console.log('spins: '+stateMap.spins);
         console.log('minorWin: '+stateMap.minorWin);
         console.log('majorWin: '+stateMap.majorWin);
-
-        if (stateMap.minorWin) {
-          showWin('minor');
-        }
-
-        if (stateMap.majorWin){
-          console.log('resetting...');
-          showWin('major');
-          reset();
-        }
 
         _.each(createSlots(), function(slot, i) {
           jqueryMap.$slots
@@ -285,17 +377,73 @@ window.slots = (function() {
 
       stateMap.spins++;
     }
-
   };
 
-  showWin = function( prize ) {
-    alert('show prize: ' + prize);
+  slotsSpinning = function() {
+    console.log('slotsSpinning');
+    stateMap.isSpinning = true;
   };
 
-  reset = function() {
-    stateMap.spins = 0;
-    genRandomWin();
+  slotsStopped = function() {
+    console.log('slotsStopped');
+    stateMap.isSpinning = false;
+
+    if (stateMap.minorWin || stateMap.majorWin) showWin();
+
+    if (stateMap.majorWin) {
+      jqueryMap.$spinBtn
+        .off('click')
+        .on('click', registerRedirect);
+    }
   };
+
+  var loadComplete = function() {
+    stateMap.colLoadedCounter++;
+
+    if (stateMap.colLoadedCounter == settings.cols) {
+      // setTimeout(function() {
+        jqueryMap.$container.removeClass('slots-loading');
+      // }, 5000);
+    }
+  };
+
+  registerRedirect = function( e ) {
+    window.location = 'register';
+  };
+
+  showWin = function() {
+    var top = '';
+
+    stateMap.prize = stateMap.minorWin ? 'minor' : 'major';
+
+    top = stateMap.prize == 'minor' ? '50%' : '257px';
+
+    jqueryMap.$winningLine
+      .css({ top: top })
+      .addClass('flashing');
+
+    jqueryMap.$spinBtn.prop('disabled', true);
+
+    setTimeout(function() {
+      jqueryMap.$winningLine
+        .css({ opacity: 0 })
+        .removeClass('flashing');
+
+      jqueryMap.$spinBtn.prop('disabled', false);
+
+      $(document).trigger({
+        type: 'slots-show-win',
+        prize: stateMap.prize,
+        $spinBtn: jqueryMap.$spinBtn,
+        $jackpot: jqueryMap.$jackpot
+      });
+    }, 3000);
+  };
+
+  // reset = function() {
+  //   stateMap.spins = 0;
+  //   genRandomWin();
+  // };
 
   /* PUBLIC METHODS */
   // init
@@ -307,6 +455,11 @@ window.slots = (function() {
     
     jqueryMap.$spinBtn
       .on('click', spinIt);
+
+    $(document)
+      .on('load-complete', loadComplete)
+      .on('slots-spinning', slotsSpinning)
+      .on('slots-stopped', slotsStopped);
   };
 
   // return public methods

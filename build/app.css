@@ -1,16 +1,272 @@
+/** Begin reset */
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-bottom: 6pt;
+}
+ol,
+ul,
+dl {
+  list-style-position: inside;
+}
+/** End reset */
+/*
+variables
+*/
+@font-face {
+  font-family: 'BlackoakStd';
+  src: url('../assets/fonts/BlackoakStd.otf');
+}
+#container {
+  background: url('../assets/images/background.jpg') no-repeat;
+  position: relative;
+  margin: 0 auto;
+  width: 885px;
+  height: 458px;
+}
+#container.slots-loading:after {
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  font-family: 'BlackoakStd';
+  font-size: 10px;
+  color: #F1BA48;
+  content: 'Loading...';
+  text-shadow: -2px 2px 3px #000000;
+  -webkit-transform: scale(1, 2);
+}
+#logo {
+  background: url('../assets/images/rango-logo.png') no-repeat;
+  position: absolute;
+  left: 143px;
+  width: 226px;
+  height: 102px;
+  z-index: 4;
+}
+#rango {
+  background: url('../assets/images/rango.png') no-repeat;
+  position: absolute;
+  top: 59px;
+  left: 430px;
+  width: 218px;
+  height: 371px;
+  z-index: 4;
+}
+#register {
+  background: url('../assets/images/register.png') no-repeat;
+  position: absolute;
+  width: 200px;
+  height: 52px;
+  border: none;
+  left: 615px;
+  top: 130px;
+  z-index: 2;
+}
+#register:hover {
+  background: url('../assets/images/register-hover.png') no-repeat;
+}
+#win {
+  position: absolute;
+  top: -458px;
+  width: 549px;
+  height: 458px;
+  opacity: 0;
+  z-index: 3;
+}
+#win div {
+  display: none;
+  position: absolute;
+  top: 115px;
+  left: 90px;
+  width: 330px;
+  height: 250px;
+}
+#win div#minor {
+  background: url('../assets/images/win10.png') no-repeat;
+}
+#win div#major {
+  background: url('../assets/images/win250.png') no-repeat;
+}
+#win div#major span {
+  font-family: 'BlackoakStd', sans-serif;
+  -webkit-transform: scale(1, 2.75);
+  color: #fff;
+  font-size: 12px;
+  display: block;
+  position: absolute;
+  top: 218px;
+  left: 65px;
+}
+.slots-wrapper .slots {
+  position: relative;
+  top: 34px;
+  left: 12px;
+  z-index: 1;
+}
+.slots-wrapper .slots ul li img {
+  margin-top: 4px;
+}
+.slots-wrapper .slots .slots-winning-line {
+  background: url('../assets/images/win-line-1px.png') repeat-x;
+}
+.slots-wrapper .slots-jackpot {
+  color: #fff;
+  font-family: 'BlackoakStd', sans-serif;
+  -webkit-transform: scale(1, 2.75);
+  font-size: 9px;
+  position: relative;
+  top: 42px;
+  left: 380px;
+  width: 178px;
+  height: 35px;
+}
+.slots-wrapper .slots-status-display {
+  background: url('../assets/images/sign-wood.png') no-repeat;
+  color: #F1BA48;
+  position: relative;
+  top: 26px;
+  left: 80px;
+  width: 356px;
+  height: 82px;
+  text-align: center;
+  padding: 30px;
+  text-transform: capitalize;
+  text-shadow: -2px 2px 3px #000000;
+  z-index: 2;
+}
+.slots-wrapper .slots-status-display span {
+  font-family: 'BlackoakStd', sans-serif;
+  -webkit-transform: scale(1, 2);
+  line-height: 1em;
+}
+.slots-wrapper .slots-status-display span.slots-status-start {
+  font-size: 13px;
+}
+.slots-wrapper .slots-status-display span.slots-status-try-again {
+  font-size: 10px;
+}
+.slots-wrapper button {
+  background: url('../assets/images/spin.png') no-repeat;
+  position: relative;
+  bottom: 89px;
+  left: 496px;
+  width: 135px;
+  height: 118px;
+  z-index: 5;
+}
+.slots-wrapper button:not(:disabled) {
+  animation: pulsing 1s infinite;
+  -webkit-animation: pulsing 1s infinite;
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pulsing {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.8, 0.8);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+@-webkit-keyframes pulsing {
+  0% {
+    -webkit-transform: scale(1, 1);
+  }
+  50% {
+    -webkit-transform: scale(0.8, 0.8);
+  }
+  100% {
+    -webkit-transform: scale(1, 1);
+  }
+}
 
-.slots {
+.slots-loading .slots-wrapper {
+  display: none;
+}
+.slots-wrapper {
+  position: relative;
+}
+.slots-wrapper .slots {
   overflow: hidden;
 }
-.slots ul {
+.slots-wrapper .slots ul {
   position: relative;
   top: 0;
   float: left;
   margin: 0;
   padding: 0;
+  text-align: center;
 }
-.slots ul li {
+.slots-wrapper .slots ul li {
   list-style-type: none;
-  width: 87px;
-  height: 96px;
+}
+.slots-wrapper .slots-status-display span {
+  display: none;
+}
+.slots-wrapper .slots-status-display.show-start span.slots-status-start {
+  display: block;
+}
+.slots-wrapper .slots-status-display.show-try-again span.slots-status-try-again {
+  display: block;
+}
+.slots-wrapper button {
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+.slots-wrapper .slots-winning-line {
+  position: absolute;
+  width: 100%;
+  height: 16px;
+  margin-top: -8px;
+  z-index: 2;
+  opacity: 0;
+}
+.flashing {
+  animation: fadein 500ms infinite;
+  -webkit-animation: fadein 500ms infinite;
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

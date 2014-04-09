@@ -1,15 +1,71 @@
-.slots {
-  overflow: hidden;
-  ul {
-    position: relative;
-    top: 0;
-    float: left;
-    margin: 0;
-    padding: 0;
-    li {
-      list-style-type: none;
-      width: 87px;
-      height: 96px;
+.slots-loading {
+  .slots-wrapper {
+    display: none;
+    // opacity: 0;
+  }
+}
+
+.slots-wrapper {
+  position: relative;
+
+  .slots {
+    overflow: hidden;
+    ul {
+      position: relative;
+      top: 0;
+      float: left;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      li {
+        list-style-type: none;
+      }
     }
   }
+
+  .slots-status-display {
+    span {
+      display: none;
+    }
+    &.show-start {
+      span.slots-status-start {
+        display: block;
+      }
+    }
+    &.show-try-again {
+      span.slots-status-try-again {
+        display: block;
+      }
+    }
+  }
+
+  button {
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .slots-winning-line {
+    position: absolute;
+    width: 100%;
+    height: 16px;
+    margin-top: -8px;
+    z-index: 2;
+    opacity: 0;
+  }
+}
+
+.flashing {
+  animation: fadein 500ms infinite;
+  -webkit-animation: fadein 500ms infinite;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-webkit-keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
