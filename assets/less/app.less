@@ -13,16 +13,12 @@
 /*
 variables
 */
-@assets: '../assets/';
-@images: '@{assets}images/';
+// @dir: '../assets/';
+@dir: '../build/';
+@images: '@{dir}images/';
 
 .bg-img(@img) {
   background: url('@{images}@{img}') no-repeat;
-}
-
-@font-face {
-  font-family: 'BlackoakStd';
-  src: url('@{assets}fonts/BlackoakStd.otf');
 }
 
 #container {
@@ -36,20 +32,12 @@ variables
       position: absolute;
       top: 50%;
       left: 25%;
-      font-family: 'BlackoakStd';
-      font-size: 10px;
+      font-size: 25px;
       color: #F1BA48;
       content: 'Loading...';
       text-shadow: -2px 2px 3px #000;
-      -webkit-transform: scale(1, 2);
     }
   }
-  // &:not(.slots-loading) {
-  //   .slots-wrapper {
-  //     animation: fadein 500ms;
-  //     -webkit-animation: fadein 500ms;
-  //   }
-  // }
 }
 
 #logo {
@@ -85,7 +73,8 @@ variables
   }
 }
 
-#win {
+.win {
+  // .bg-img('rango-win.gif');
   position: absolute;
   top: -458px;
   width: 549px;
@@ -99,20 +88,39 @@ variables
     left: 90px;
     width: 330px;
     height: 250px;
-    &#minor {
-      .bg-img('win10.png');
+    a {
+      .bg-img('register-now-button.png');
+      display: block;
+      position: absolute;
+      width: 177px;
+      height: 30px;
+      animation: fadein 1.5s infinite;
+      -webkit-animation: fadein 1.5s infinite;
     }
-    &#major {
+  }
+  &#win-minor {
+    div {
+      .bg-img('win10.png');
+      a {
+        top: 74px;
+        left: 120px;
+      }
+    }
+  }
+  &#win-major {
+    div {
       .bg-img('win250.png');
+      a {
+        top: 100px;
+        left: 163px;
+      }
       span {
-        font-family: 'BlackoakStd', sans-serif;
-        -webkit-transform:scale(1, 2.75);
         color: #fff;
-        font-size: 12px;
+        font-size: 35px;
         display: block;
         position: absolute;
-        top: 218px;
-        left: 65px;
+        top: 207px;
+        left: 69px;
       }
     }
   }
@@ -138,11 +146,9 @@ variables
 
   .slots-jackpot {
     color: #fff;
-    font-family: 'BlackoakStd', sans-serif;
-    -webkit-transform:scale(1, 2.75);
-    font-size: 9px;
+    font-size: 25px;
     position: relative;
-    top: 42px;
+    top: 10px;
     left: 380px;
     width: 178px;
     height: 35px;
@@ -157,19 +163,18 @@ variables
     width: 356px;
     height: 82px;
     text-align: center;
-    padding: 30px;
+    padding: 5px;
     text-transform: capitalize;
     text-shadow: -2px 2px 3px #000;
     z-index: 2;
     span {
-      font-family: 'BlackoakStd', sans-serif;
-      -webkit-transform:scale(1, 2);
-      line-height: 1em;
+      width: 345px;
+      height: 77px;
       &.slots-status-start {
-        font-size: 13px;
+        .bg-img('click-spin.png');
       }
       &.slots-status-try-again {
-        font-size: 10px;
+        .bg-img('bad-luck.png');
       }
     }
   }
@@ -191,13 +196,15 @@ variables
 }
 
 @keyframes fadein {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @-webkit-keyframes fadein {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes pulsing {

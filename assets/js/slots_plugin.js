@@ -1,9 +1,3 @@
-/* **************************************************
-   TODO: Preload images
-         Optimize images using grunt-contrib-imagemin
-         LiveReload
- ****************************************************/
-
 ;
 window.slots = (function() {
   'use strict';
@@ -14,8 +8,9 @@ window.slots = (function() {
       jackpot: 2467589.32,
       spinBtnText: '',
       images: [],
-      imagesDir: 'https://raw.githubusercontent.com/jpvuong/slots-app/master/assets/images/',
+      // imagesDir: 'https://raw.githubusercontent.com/jpvuong/slots-app/master/assets/images/slot_elements/',
       // imagesDir: 'assets/images/slot_elements/',
+      imagesDir: 'build/images/slot_elements/',
       imageExt: '.png',
       imageWidth: 100,
       imageHeight: 103,
@@ -30,9 +25,8 @@ window.slots = (function() {
       duration: 600,
       delayed: 200,
       easing: 'easeOutBounce',
-      startMsg: 'Click "spin" to spin the reels',
-      tryAgainMsg: 
-        'Bad luck. Try another spin to see if you hit a winning line.'
+      startMsg: '',
+      tryAgainMsg: ''
     },
 
     jqueryMap = {
@@ -65,7 +59,8 @@ window.slots = (function() {
     setJqueryMap, genRandomWin, setup, build, createSlots, createSlotCol, 
     createSlotElems, willLose, createProgressiveJackpot, jackpotInt,
     createStatusDisplay, createSpinBtn, createWinningLine, spinIt,
-    slotsSpinning, slotsStopped, registerRedirect, showWin, reset, init
+    slotsSpinning, slotsStopped, loadComplete, registerRedirect, showWin, 
+    reset, init
   ;
 
   setJqueryMap = function( extend ) {
@@ -100,7 +95,6 @@ window.slots = (function() {
 
   /* DOM METHODS */
   // build
-  // TODO: Loading...
   build = function() {
     var slotsWrapper = document.createElement('div'),
         slots = document.createElement('div');
@@ -397,14 +391,11 @@ window.slots = (function() {
     }
   };
 
-  var loadComplete = function() {
+  loadComplete = function() {
     stateMap.colLoadedCounter++;
 
-    if (stateMap.colLoadedCounter == settings.cols) {
-      // setTimeout(function() {
-        jqueryMap.$container.removeClass('slots-loading');
-      // }, 5000);
-    }
+    if (stateMap.colLoadedCounter == settings.cols)
+      jqueryMap.$container.removeClass('slots-loading');
   };
 
   registerRedirect = function( e ) {

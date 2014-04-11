@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-imagemin');
 
   // Project configuration.
   grunt.initConfig({
@@ -10,10 +11,10 @@ module.exports = function(grunt) {
       development: {
         options: {
           paths: 'src',
-          yuicompress: true
+          compress: true
         },
         files: {
-          'build/app.css': 'assets/less/*.less'
+          'build/app.min.css': 'assets/less/*.less'
         }
       }
     },
@@ -25,6 +26,10 @@ module.exports = function(grunt) {
       theme_js: {
         files: 'assets/js/*.js',
         tasks: 'uglify'
+      },
+      imagemin: {
+        files: 'assets/images/**/*.{png,jpg,gif}',
+        tasks: 'imagemin'
       }
     },
     uglify: {
@@ -37,6 +42,16 @@ module.exports = function(grunt) {
         files: {
           'build/app.min.js': 'assets/js/*.js'
         }
+      }
+    },
+    imagemin: {
+      dynamic: {
+        files: [{
+          expand: true,
+          cwd: 'assets/images/',
+          src: ['**/*.{png,jpg,gif}'],
+          dest: 'build/images'
+        }]
       }
     }
   });

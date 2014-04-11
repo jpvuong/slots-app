@@ -8,23 +8,24 @@ $(function() {
         // majorWinOnly: true,
         minorWinOn: 'rango1',
         majorWinOn: 'jackpot'
-      },
-      $win = $('#win');
+      };
+
+  $('#win-minor').css('background', 'url("assets/images/rango-win.gif?'+_.now()+'") no-repeat');
+  $('#win-major').css('background', 'url("assets/images/rango-win.gif?'+_.now()+'") no-repeat');
 
   slots.init( settings );
 
   $(document)
     .on('slots-show-win', function( e ) {
       e.$spinBtn.prop('disabled', true);
-
-      $win
-        .css( {background: "url('assets/images/rango-win.gif?"+_.now()+"') no-repeat"} )
+      $('#win-'+e.prize)
         .animate({
           top: 0,
           opacity: 1
         }, 250, 'easeOutQuad', function() {
+          var $that = $(this);
           setTimeout(function() {
-            $win.find('#'+e.prize).fadeIn('fast', function() {
+            $that.find('div').fadeIn('fast', function() {
               e.$spinBtn.prop('disabled', false);
             });
           }, 2500);
@@ -37,12 +38,12 @@ $(function() {
       }
     })
     .on('slots-hide-win', function( e ) {
-      $win
+      $('.win')
         .animate({
           top: '-458px',
           opacity: 0
         }, 250, 'easeOutQuad', function() {
-          $win.find('div').hide();
+          $(this).find('div').hide();
         });
       });
 });

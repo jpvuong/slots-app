@@ -4,17 +4,30 @@
   <meta charset="utf-8">
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
   <title>SLOTS</title>
-  <link rel="stylesheet" href="build/app.css">
+  <link rel="stylesheet" href="build/app.min.css">
 </head>
 <body>
   <div id="container">
     <div id="logo"></div>
     <div id="rango"></div>
     <a href="register" id="register"></a>
-    <div id="win">
+<!--     <div id="win">
       <div id="minor">
+        <a href="register" id="register-now"></a>
       </div>
       <div id="major">
+        <a href="register" id="register-now"></a>
+        <span id="jackpot"></span>
+      </div>
+    </div> -->
+    <div class="win" id="win-minor">
+      <div>
+        <a href="register" class="register-now"></a>
+      </div>
+    </div>
+    <div class="win" id="win-major">
+      <div>
+        <a href="register" class="register-now"></a>
         <span id="jackpot"></span>
       </div>
     </div>
@@ -23,8 +36,8 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-  <!--script src="build/app.min.js"></script-->
-  <script src="assets/js/slots_plugin.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="build/app.min.js"></script>
+  <!-- // <script src="assets/js/slots_plugin.js"></script> -->
+  <!-- // <script src="assets/js/app.js"></script> -->
 </body>
 </html>
